@@ -1,0 +1,59 @@
+﻿@model IEnumerable<OMGT_Lab1.Models.Result>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+@foreach (var l in ViewBag.LPR)
+{
+    <div class="container">
+        <div class="row-full">
+            <a class="btn btn-success btn-block" href="javascript:toggleDisplay('(@l.LPRName)')">@l.LPRName<span class="caret"></span></a>
+        </div>
+        <div class="content" id="(@l.LPRName)" style="display:none">
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Alternative.AlternativeName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Range)
+                    </th>
+                    <th></th>
+                </tr>
+
+                @foreach (var item in l.Results)
+                {
+                    <tr>
+                        <td>
+                            @item.Alternative.AlternativeName
+                        </td>
+                        <td>
+                            @item.Range
+                        </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", new { id = item.ResultId }) |
+                            @Html.ActionLink("Details", "Details", new { id = item.ResultId }) |
+                            @Html.ActionLink("Delete", "Delete", new { id = item.ResultId })
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        </div>
+    </div>
+    <br />
+}
+<script language="javascript">
+    function toggleDisplay(id) {
+        obj = document.getElementById(id);
+        if (obj.style.display == "none") {
+            obj.style.display = "block";
+        }
+        else {
+            obj.style.display = "none";
+        }
+    }
+</script>

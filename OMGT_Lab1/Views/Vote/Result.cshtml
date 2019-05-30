@@ -1,0 +1,89 @@
+﻿@model IEnumerable<LPR>
+@{
+    ViewData["Title"] = "Result";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Results of voting</h2>
+<div class="container-fluid table-responsive">
+    <h4>First stage results</h4>
+    <table class="table table-hover table-bordered">
+        <tr class="info">
+            @foreach (var el in ViewBag.Dict)
+            {
+                <th>@el.Key.Count</th>
+            }
+        </tr>
+        @for (int i = 0; i < ViewBag.Alt.Count; i++)
+        {
+            <tr class="warning">
+                @foreach (var el in ViewBag.Dict)
+                {
+                    <td>@el.Value[i].Alternative.AlternativeName</td>
+                }
+            </tr>
+        }
+    </table>
+    <h4>Amount of votes in the first stage:</h4>
+    @foreach (var el in ViewBag.Tops)
+    {
+        <h4>@el.Key.AlternativeName = @el.Value</h4>
+    }
+    @if (ViewBag.Top is null)
+    {
+        <br />
+        <h4>The second stage:</h4>
+        Alternative winner = ((Dictionary<Alternative, int>)ViewBag.Dict2).Where(x => x.Value == ((Dictionary<Alternative, int>)ViewBag.Dict2).Values.Max()).FirstOrDefault().Key;
+        if (((Dictionary<Alternative, int>)ViewBag.Dict2).Where(x => x.Value == ((Dictionary<Alternative, int>)ViewBag.Dict2).Values.Max()).Count() > 1)
+        {
+            winner = null;
+        }
+        <table class="table table-bordered table-hover">
+            <tr class="info">
+                @foreach (var el in ViewBag.Dict)
+                {
+                    <th>@el.Key.Count</th>
+                }
+            </tr>
+            @for (int i = 0; i < ViewBag.Alt.Count; i++)
+            {
+                <tr class="warning">
+                    @foreach (var el in ViewBag.Dict)
+                    {
+                        var dict = (Dictionary<Alternative, int>)ViewBag.Dict2;
+                        int first = dict.FirstOrDefault().Key.AlternativeId;
+                        int last = dict.LastOrDefault().Key.AlternativeId;
+                        if (el.Value[i].Alternative.AlternativeId == first ||
+                            el.Value[i].Alternative.AlternativeId == last)
+                        {
+                            <td>@el.Value[i].Alternative.AlternativeName</td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                    }
+                </tr>
+            }
+        </table>
+        if (!(winner is null))
+        {
+            <h4>In the second stage winner is @winner.AlternativeName</h4>
+            <h4>The second stage result are:</h4>
+            @foreach (var el in ViewBag.Dict2)
+            {
+                <h4>@el.Key.AlternativeName = @el.Value</h4>
+            }
+        }
+        else
+        {
+            <h4>Elections were not valid because in the second tour candidates get an equal amount of votes!</h4>
+        }
+    }
+    else
+    {
+        <h4>The winner is @ViewBag.Top.AlternativeName</h4>
+    }
+</div>
+
+

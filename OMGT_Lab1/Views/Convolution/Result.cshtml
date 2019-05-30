@@ -1,0 +1,125 @@
+﻿@model IEnumerable<Alternative>
+
+@{
+    ViewBag.Title = "Result";
+}
+<h2>Maximinimum convolution</h2>
+
+<h4>Pareto-optimal list of alternatives</h4>
+<div class="container-fluid table-responsive">
+    <table class="table table-bordered table-hover">
+        <tr class="info">
+            <th>Alternatives\Criteria</th>
+            @foreach (var criterion in ViewBag.Criteria)
+            {
+                <th>@criterion.Name</th>
+            }
+        </tr>
+        @foreach (var alt in Model)
+        {
+            <tr>
+                <td class="info">@alt.AlternativeName</td>
+                @foreach (var vec in alt.Vectors)
+                {
+                    <td class="warning">
+                        @vec.Mark.NumericMark
+                        @if (vec.Mark.Criterion.Type == OMGT_Lab1.Models.Enums.CriteriaType.Qualitative)
+                        {
+                            <span class="badge">@vec.Mark.Name</span>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+</div>
+<h4>Standartized table</h4>
+<div class="container-fluid table-responsive">
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th class="info">Alternatives\Criteria</th>
+            @foreach (var criterion in ViewBag.Criteria)
+            {
+                <th>@criterion.Name</th>
+            }
+        </tr>
+        @foreach (var alt in Model)
+        {
+            <tr>
+                <td class="info">@alt.AlternativeName</td>
+                @foreach (var vec in alt.Vectors)
+                {
+                    <td class="warning">
+                        @if (vec.Mark.StandartizedMark == alt.Vectors.Select(x => x.Mark).Select(x => x.StandartizedMark).Min())
+                        {
+                            <i class="glyphicon glyphicon-check"></i>
+                            <b>@vec.Mark.StandartizedMark</b>
+                        }
+                        else
+                        {
+                            @vec.Mark.StandartizedMark
+                        }
+                        @if (vec.Mark.Criterion.Type == OMGT_Lab1.Models.Enums.CriteriaType.Qualitative)
+                        {
+                            <span class="badge">@vec.Mark.Name</span>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+</div>
+<h4>Results of maximinimum convolution</h4>
+<div class="container-fluid table-responsive">
+    <table class="table table-bordered table-hover">
+        <tr class="info">
+            <th>Alternatives\Criteria</th>
+            @foreach (var criterion in ViewBag.Criteria)
+            {
+                <th>@criterion.Name</th>
+            }
+            <th>Minimal values</th>
+        </tr>
+        @foreach (var alt in Model)
+        {
+            <tr>
+                @if (alt.AlternativeId == ViewBag.Winner.AlternativeId)
+                {
+                    <td class="success"><b>@alt.AlternativeName</b></td>
+                    @foreach (var vec in alt.Vectors)
+                    {
+                        <td class="success">
+                            <b>
+                                <i class="glyphicon glyphicon-ok-sign"></i> @vec.Mark.StandartizedMark
+                                @if (vec.Mark.Criterion.Type == OMGT_Lab1.Models.Enums.CriteriaType.Qualitative)
+                                {
+                                    <span class="badge">@vec.Mark.Name</span>
+                                }
+                            </b>
+                        </td>
+                    }
+                    double min = alt.Vectors.Select(x => x.Mark).Select(x => x.StandartizedMark).Min();
+                    <td class="success"><i class="glyphicon glyphicon-ok-sign"></i><b>@min</b></td>
+                }
+                else
+                {
+                    <td class="warning">@alt.AlternativeName</td>
+                    @foreach (var vec in alt.Vectors)
+                    {
+                        <td class="warning">
+
+                            @vec.Mark.StandartizedMark
+                            @if (vec.Mark.Criterion.Type == OMGT_Lab1.Models.Enums.CriteriaType.Qualitative)
+                            {
+                                <span class="badge">@vec.Mark.Name</span>
+                            }
+
+                        </td>
+                    }
+                    double min = alt.Vectors.Select(x => x.Mark).Select(x => x.StandartizedMark).Min();
+                    <td class="warning">@min</td>
+                }
+            </tr>
+        }
+    </table>
+</div>

@@ -1,0 +1,234 @@
+﻿@model IEnumerable<Alternative>
+@{
+    ViewBag.Title = "Fill data";
+}
+<h2>Main criterion method</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.Hidden("State", ViewBag.State, htmlAttributes: new { @class = "form-control" })
+    @Html.Hidden("MainCriterion", ViewBag.MainCriterion.CriterionId, htmlAttributes: new { @class = "form-control" })
+    @if (ViewBag.State != "Result")
+    {
+        <h4>Please, fill data in qualitative criteria in order to get a correct result!</h4>
+        <h4>Use the scale from 1 up to 5 points to mark the criterion</h4>
+        <div class="container-fluid table-responsive">
+            <table class="table table-bordered table-hover">
+                <tr class="row info">
+                    <th>Criteria\Alternative</th>
+                    @foreach (var criterion in ViewBag.Criteria)
+                    {
+                        @if (!(ViewBag.MainCriterion is null) && criterion.CriterionId == ViewBag.MainCriterion.CriterionId)
+                        {
+                    <th>
+                        <i class="glyphicon glyphicon-ok-circle"></i> @criterion.Name
+                        <span class="badge">@criterion.Unit.ToString()</span>
+                    </th>
+                            
+                        }
+                        else
+                        {
+                    <th>
+                        @criterion.Name
+                        <span class="badge">@criterion.Unit.ToString()</span>
+                    </th>
+                            
+                        }
+
+                    }
+                </tr>
+                @foreach (var el in Model)
+                {
+                    <tr class="row">
+                        <td class="info">
+
+                            @el.AlternativeName
+
+                        </td>
+                        @{
+                            foreach (var criterion in ViewBag.Criteria)
+                            {
+                                var defaultValue = el.Vectors.Where(x => x.Mark.Criterion.CriterionId == criterion.CriterionId).Count() != 0 ? el.Vectors.Where(x => x.Mark.Criterion.CriterionId == criterion.CriterionId).FirstOrDefault().Mark : new Mark();
+                                if (ViewBag.State == "Initial")
+                                {
+                                    if (criterion.Type == OMGT_Lab1.Models.Enums.CriteriaType.Quantitative)
+                                    {
+                                        <td class="success">
+                                            @defaultValue.NumericMark
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td class="success">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="glyphicon glyphicon-edit"></i></span>
+                                                @Html.DropDownList(el.AlternativeName, new SelectList(Enumerable.Range(1, 5), defaultValue.NumericMark), htmlAttributes: new { @class = "form-control col-md-1" })
+                                                @{
+                                                    string Name = "Qualitative mark : " + defaultValue.Name;
+                                                }
+                                            </div>
+                                            <span class="badge">@Name</span>
+
+                                        </td>
+                                    }
+                                }
+                                else if (ViewBag.State == "Limitations")
+                                {
+                                    <td class="success col-md-4">
+                                        @if (defaultValue.CriterionId == ViewBag.MainCriterion.CriterionId)
+                                        {
+                                            <b>@defaultValue.NumericMark</b>
+                                        }
+                                        else
+                                        {
+                                            @defaultValue.NumericMark
+                                        }
+                                        @if (defaultValue.Criterion.Type == OMGT_Lab1.Models.Enums.CriteriaType.Qualitative)
+                                        {
+                                            string Name = "Qualitative mark: " + defaultValue.Name;
+                                            <span class="badge">@Name</span>
+                                        }
+                                    </td>
+                                }
+                            }
+                        }
+                    </tr>
+                }
+
+            </table>
+        </div>
+    }
+    @if (ViewBag.State == "Initial")
+    {
+        <h4>Please, select main criterion</h4>
+        <div class="form-group col-md-4">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="glyphicon glyphicon-check"></i>
+                </span>
+                @Html.DropDownList("MainCriterion", new SelectList(ViewBag.Names), htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+    }
+    else if (ViewBag.State == "Limitations")
+    {
+        <h4>Please, enter an upper or lower limitation bound for other criteria</h4>
+        <div class="table-responsive container-fluid">
+            <table class="table table-bordered table-hover">
+                <tr class="row">
+                    <th>Criterion</th>
+                    <th>Limitation</th>
+                    <th>Optimization type</th>
+                </tr>
+                @foreach (var el in ViewBag.CriteriaExceptMain)
+                {
+                    <tr class="row">
+                        <td>@el.Name</td>
+                        <td>
+                            @Html.Editor("Limitation", "Limitation", "Limitation", new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                        </td>
+                        <td>@el.OptimType</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+    else
+    {
+        @if (!(ViewBag.Best is null) && ViewBag.Best.Count != 0)
+        {
+            <h4>The best alternative by the main criterion method is @ViewBag.Best[0].AlternativeName</h4>
+            <h4>Final table you could see here:</h4>
+            <div class="container-fluid table-responsive">
+                <table class="table table-bordered table-hover">
+                    <tr class="info row">
+                        <th>Place</th>
+                        <th>Alternative Name</th>
+                        @foreach (var vector in ViewBag.Best[0].Vectors)
+                        {
+                            @if (vector.Mark.CriterionId != ViewBag.MainCriterion.CriterionId)
+                            {
+                                <th>@vector.Mark.Criterion.Name</th>
+                            }
+                            else
+                            {
+                                <th><i class="glyphicon glyphicon-ok-circle"></i> @vector.Mark.Criterion.Name</th>
+                            }
+                        }
+                    </tr>
+                    @foreach (var a in ViewBag.Best)
+                    {
+
+                        int place = ViewBag.Best.IndexOf(a) + 1;
+
+                        if (ViewBag.Best.IndexOf(a) == 0)
+                        {
+                            <tr class="success row">
+                                <td><i class="glyphicon glyphicon-ok-sign"></i> @place</td>
+                                <td><i class="glyphicon glyphicon-ok-sign"></i> @a.AlternativeName</td>
+                                @foreach (var vec in a.Vectors)
+                                {
+                                    if (vec.Mark.CriterionId == ViewBag.MainCriterion.CriterionId)
+                                    {
+                                        <td><i class="glyphicon glyphicon-ok-sign"></i> <b>@vec.Mark.NumericMark</b></td>
+                                    }
+                                    else
+                                    {
+                                        <td><i class="glyphicon glyphicon-ok-sign"></i> @vec.Mark.NumericMark</td>
+                                    }
+                                }
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr class="warning row">
+                                <td>@place</td>
+                                <td>@a.AlternativeName</td>
+                                @foreach (var vec in a.Vectors)
+                                {
+                                    if (vec.Mark.CriterionId == ViewBag.MainCriterion.CriterionId)
+                                    {
+                                        <td><b>@vec.Mark.NumericMark</b></td>
+                                    }
+                                    else
+                                    {
+                                        <td>@vec.Mark.NumericMark</td>
+                                    }
+                                }
+                            </tr>
+                        }
+                    }
+                </table>
+            </div>
+        }
+        else
+        {
+            <h4>We are very sorry, but you've declared contradictory limitations for marks i.e there is no best alternative:(</h4>
+        }
+    }
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            @{
+                string value = "";
+                if (ViewBag.State == "Initial")
+                {
+                    value = "Send data";
+                }
+                else if (ViewBag.State == "Limitations")
+                {
+                    value = "Send limitation data";
+                }
+            }
+            @if (ViewBag.State != "Result")
+            {
+                <input type="submit" value=@value class="btn btn-default" />
+            }
+            else
+            {
+                @Html.ActionLink("Back to List", "Index")
+            }
+        </div>
+    </div>
+}

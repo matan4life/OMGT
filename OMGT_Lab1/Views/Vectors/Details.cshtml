@@ -1,0 +1,17 @@
+﻿@model OMGT_Lab1.Models.Vector
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Vector</h4>
+    <hr />
+    <dl class="dl-horizontal"></dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.VectorId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

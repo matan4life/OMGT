@@ -1,0 +1,109 @@
+﻿@model IEnumerable<OMGT_Lab1.Models.Alternative>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Alternative> newList = new List<Alternative>(Model);
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="js/jquery-3.3.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".up,.down").click(function () {
+            var $element = this;
+            var row = $($element).parents("tr:first");
+            if ($(this).is('.up')) {
+                if (!($(row.prev()).is('.info'))) {
+                    row.insertBefore(row.prev());
+                }
+            }
+            else {
+                row.insertAfter(row.next());
+            }
+        });
+
+    });
+    $(document).submit(function () {
+        let element = document.getElementsByClassName("table")[0].children[0].children;
+        for (let i = 1; i < element.length; i++) {
+            let aname = element[i].children[2].innerHTML;
+            let input = document.getElementsByName('' + aname);
+            var control = Array.from(input)[0];
+            control.value = "" + i;
+        }
+    });
+</script>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken();
+    <h2 class="text-info">Welcome to the voting system!</h2>
+    <h4 class="text-primary">As you've verified your voting permission, you are able to vote for the candidates!</h4>
+    <h4 class="text-warning">
+        We are using
+        the rule of relative majority with elimination
+    </h4>
+    <h5>Here you could see the list of candidates. Place them according to your order and your preferences.</h5>
+    <div class="container-fluid table-responsive">
+        <table class="table table-hover table-bordered">
+            <tr class="info row">
+                <th>Alternative place</th>
+                <th>Criteria\Alternative</th>
+                @foreach (var c in ViewBag.Criteria)
+                {
+                    <th>
+                        @c.Name
+                        @if (c.Unit != OMGT_Lab1.Models.Enums.Units.None)
+                        {
+                            if (c.Unit != OMGT_Lab1.Models.Enums.Units.USD)
+                            {
+                                <span class="label label-default">@c.Unit.ToString()</span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-usd"></span>
+                            }
+                        }
+                    </th>
+                }
+            </tr>
+            @foreach (var a in newList)
+            {
+                <tr class="row">
+                    @Html.Hidden(a.AlternativeName)
+                    <td class="danger">
+                        <a class="up" href="#"><i class="glyphicon glyphicon-arrow-up"></i></a>
+                        <a class="down" href="#"><i class="glyphicon glyphicon-arrow-down"></i></a>
+                    </td>
+                    <td class="info">@a.AlternativeName</td>
+                    @foreach (var v in a.Vectors)
+                    {
+                        <td class="active">
+                            @if (v.Mark.Criterion.Type == OMGT_Lab1.Models.Enums.CriteriaType.Quantitative)
+                            {
+                                <span class="label label-info">
+                                    @v.Mark.NumericMark
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="label label-info">
+                                    @v.Mark.Name
+                                </span>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Submit" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+
+}
+<script>
+
+</script>
+

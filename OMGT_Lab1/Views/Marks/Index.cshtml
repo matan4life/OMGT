@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Mark>
+
+@{
+    ViewBag.Title = "Marks";
+}
+
+<h2>Index</h2>
+@foreach (var criterion in ViewBag.Criteria)
+{
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <p class="text-center">@criterion.Name</p>
+        </div>
+
+        <div class="body-content">
+            <table class="table">
+                @foreach (var mark in Model.Where(x=>x.CriterionId==criterion.CriterionId))
+                {
+                    <tr>
+                        <td>
+                            @if (criterion.Type == OMGT_Lab1.Models.Enums.CriteriaType.Qualitative)
+                            {
+                                <p class="text-left">@mark.Name</p>
+                            }
+                            else
+                            {
+                                <p class="text-left">@mark.NumericMark</p>
+                            }
+                        </td>
+                        <td>
+                            <p class="text-right">
+                                @Html.ActionLink("Edit", "Edit", new { id = mark.MarkId }) |
+                                @Html.ActionLink("Details", "Details", new { id = mark.MarkId }) |
+                                @Html.ActionLink("Delete", "Delete", new { id = mark.MarkId })
+                            </p>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+
+}

@@ -1,0 +1,35 @@
+﻿@model OMGT_Lab1.Models.LPR
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>LPR</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.LPRName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LPRName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LPRRange)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LPRRange)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.LPRId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+

@@ -1,0 +1,71 @@
+﻿@model IEnumerable<OMGT_Lab1.Models.Vector>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+@foreach (var alternative in ViewBag.Alternatives)
+{
+    <div class="container">
+        <div class="row-full">
+            <a class="btn btn-primary btn-block" href="javascript:toggleDisplay('(@alternative.AlternativeName)')">@alternative.AlternativeName<span class="caret"></span></a>
+        </div>
+        <div class="content" id="(@alternative.AlternativeName)" style="">
+            <p>
+                @Html.ActionLink("Add vectors", "Create", new { id = alternative.AlternativeId })
+            </p>
+            <table class="table">
+                <tr>
+                    <th>Criteria</th>
+                    <th>Mark</th>
+                    <th>Unit</th>
+                </tr>
+
+                @foreach (var vector in alternative.Vectors)
+                {
+                <tr>
+                    <td>
+                        @vector.Mark.Criterion.Name
+                    </td>
+                    @if (vector.Mark.Criterion.Type == OMGT_Lab1.Models.Enums.CriteriaType.Quantitative)
+                    {
+                        <td>
+                            @vector.Mark.NumericMark
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            @vector.Mark.Name
+                        </td>
+                    }
+                    <td>
+                        @vector.Mark.Criterion.Unit
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = vector.VectorId }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = vector.VectorId })
+                    </td>
+                </tr>
+
+                }
+
+            </table>
+        </div>
+    </div>
+    <br />
+}
+
+<script language="javascript">
+            function toggleDisplay(id) {
+                obj = document.getElementById(id);
+                if (obj.style.display == "none") {
+                    obj.style.display = "block";
+                }
+                else {
+                    obj.style.display = "none";
+                }
+            }
+</script>

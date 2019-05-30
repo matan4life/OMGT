@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Alternative>
+@{
+    ViewBag.Title = "Fill data";
+}
+<h2>Maximinimum convolution</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <h4>Please, fill data in qualitative criteria in order to get a correct result!</h4>
+    <h4>Use the scale from 1 up to 5 points to mark the criterion</h4>
+    <div class="container-fluid table-responsive">
+        <table class="table table-condensed table-hover">
+            <tr class="row info">
+                <th>Criteria\Alternative</th>
+                @foreach (var criterion in ViewBag.Criteria)
+                {
+                    <th>
+                        @criterion.Name
+                    </th>
+                }
+            </tr>
+            @foreach (var el in Model)
+            {
+                <tr class="row">
+                    <td class="info">@el.AlternativeName</td>
+                    @{
+                        foreach (var criterion in ViewBag.Criteria)
+                        {
+                            var defaultValue = el.Vectors.Where(x => x.Mark.Criterion.CriterionId == criterion.CriterionId).Count() != 0 ? el.Vectors.Where(x => x.Mark.Criterion.CriterionId == criterion.CriterionId).FirstOrDefault().Mark : new Mark();
+                            if (criterion.Type == OMGT_Lab1.Models.Enums.CriteriaType.Quantitative)
+                            {
+                                <td class="success">
+                                    @defaultValue.NumericMark
+                                </td>
+                            }
+                            else
+                            {
+                                <td class="success">
+                                    @Html.DropDownList(el.AlternativeName, new SelectList(Enumerable.Range(1, 5), defaultValue.NumericMark), htmlAttributes: new { @class = "form-control col-md-2" })
+                                    @{
+                                        string Name = "Qualitative mark : " + defaultValue.Name;
+                                    }
+                                    <span class="badge">@Name</span>
+                                </td>
+                            }
+                        }
+                    }
+                </tr>
+            }
+
+        </table>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Send data" class="btn btn-default" />
+        </div>
+    </div>
+}

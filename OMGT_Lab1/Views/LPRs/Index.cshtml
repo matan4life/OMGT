@@ -1,0 +1,40 @@
+﻿@model IEnumerable<OMGT_Lab1.Models.LPR>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.LPRName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LPRRange)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.LPRName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LPRRange)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.LPRId }) |
+                @Html.ActionLink("Details", "Details", new { id = item.LPRId }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.LPRId })
+            </td>
+        </tr>
+    }
+
+</table>
